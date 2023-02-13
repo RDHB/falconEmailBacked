@@ -1,4 +1,4 @@
-package main
+package scripts
 
 import (
 	"archive/tar"
@@ -16,11 +16,8 @@ import (
 	EmailModel "falconEmailBackend/pkg/models/zincsearchemail"
 )
 
-func main() {
-	indexer()
-}
-
-func indexer() {
+// Indexer function that allow send indexed data to zincsearch
+func Indexer() {
 	filepath := "/home/rdhb/go/src/falconEmailBackend/data/enron_mail_20110402.tgz"
 	indexerEmails(filepath)
 }
@@ -39,8 +36,8 @@ func indexerEmails(filePath string) {
 	}
 	log.Println("Data was obtained from tgz file")
 
-	// sendDataToZincSearchIndexer(data)
-	sendBulkData(data)
+	sendDataToZincSearchIndexer(data)
+	// sendBulkData(data)
 }
 
 func getDataFromFileTGZ(filePath string) ([]EmailModel.Email, error) {
@@ -166,89 +163,89 @@ func getEmail(tarReader *tar.Reader, header *tar.Header) EmailModel.Email {
 func createIndexZincSearchEnronCorpEmails() {
 	method := http.MethodPost
 	url := "http://localhost:4080/api/index"
-	user := os.Getenv("ZINCSEARCH_USER_ID_ADMIN")      //"admin"
-	password := os.Getenv("ZINCSEARCH_PASSWORD_ADMIN") //"Complexpass#123"
+	user := "admin"               //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
+	password := "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
 	body := `{
 		"name": "enronCorpEmails",
 		"storage_type": "disk",
 		"shard_num": 3,
-"mappings": {
-	"properties": {
-		"@timestamp": {
-			"type": "date",
-			"index": true,
-			"store": true,
-			"sortable": true,
-			"aggregatable": true,
-			"highlightable": true
-		},
-		"_id": {
-			"type": "keyword",
-			"index": true,
-			"store": false,
-			"sortable": true,
-			"aggregatable": true,
-			"highlightable": false
-		},
-		"bcc": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
-		},
-		"cc": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
-		},
-		"date": {
-			"type": "date",
-			"format": "2006-01-02T15:04:05Z07:00",
-			"index": true,
-			"store": true,
-			"sortable": true,
-			"aggregatable": true,
-			"highlightable": true
-		},
-		"from": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
-		},
-		"message": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
-		},
-		"subject": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
-		},
-		"to": {
-			"type": "text",
-			"index": true,
-			"store": true,
-			"sortable": false,
-			"aggregatable": false,
-			"highlightable": true
+		"mappings": {
+			"properties": {
+				"@timestamp": {
+					"type": "date",
+					"index": true,
+					"store": true,
+					"sortable": true,
+					"aggregatable": true,
+					"highlightable": true
+				},
+				"_id": {
+					"type": "keyword",
+					"index": true,
+					"store": false,
+					"sortable": true,
+					"aggregatable": true,
+					"highlightable": false
+				},
+				"bcc": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				},
+				"cc": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				},
+				"date": {
+					"type": "date",
+					"format": "2006-01-02T15:04:05Z07:00",
+					"index": true,
+					"store": true,
+					"sortable": true,
+					"aggregatable": true,
+					"highlightable": true
+				},
+				"from": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				},
+				"message": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				},
+				"subject": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				},
+				"to": {
+					"type": "text",
+					"index": true,
+					"store": true,
+					"sortable": false,
+					"aggregatable": false,
+					"highlightable": true
+				}
+			}
 		}
-	}
-  }
 	}`
 
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
@@ -288,8 +285,8 @@ func zincsearchSendDataAPI(method string, url string, user string, password stri
 func sendDataToZincSearchIndexer(data []EmailModel.Email) {
 	method := http.MethodPost
 	url := "http://localhost:4080/api/enronCorpEmails/_doc"
-	user := os.Getenv("ZINCSEARCH_USER_ID_ADMIN")      //"admin"
-	password := os.Getenv("ZINCSEARCH_PASSWORD_ADMIN") //"Complexpass#123"
+	user := "admin"               //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
+	password := "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
 
 	for i := 0; i < len(data); i++ {
 
