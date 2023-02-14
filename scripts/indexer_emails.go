@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +15,13 @@ import (
 	"time"
 
 	EmailModel "falconEmailBackend/pkg/models/zincsearchemail"
+)
+
+const (
+	index    = "enronCorpEmailsN"
+	host     = "http://localhost:4080"
+	user     = "admin"           //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
+	password = "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
 )
 
 // Indexer function that allow send indexed data to zincsearch
@@ -162,11 +170,9 @@ func getEmail(tarReader *tar.Reader, header *tar.Header) EmailModel.Email {
 
 func createIndexZincSearchEnronCorpEmails() {
 	method := http.MethodPost
-	url := "http://localhost:4080/api/index"
-	user := "admin"               //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
-	password := "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
+	url := fmt.Sprintf("%s/api/index", host)
 	body := `{
-		"name": "enronCorpEmails",
+		"name": "enronCorpEmailsN",
 		"storage_type": "disk",
 		"shard_num": 3,
 		"mappings": {
@@ -248,20 +254,7 @@ func createIndexZincSearchEnronCorpEmails() {
 		}
 	}`
 
-	req, err := http.NewRequest(method, url, strings.NewReader(body))
-	if err != nil {
-		log.Println(err)
-	}
-
-	req.SetBasicAuth(user, password)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-
-	resp.Body.Close()
+	zincsearchSendDataAPI(method, url, user, password, bytes.NewBuffer([]byte(body)))
 }
 
 func zincsearchSendDataAPI(method string, url string, user string, password string, body *bytes.Buffer) {
@@ -284,9 +277,7 @@ func zincsearchSendDataAPI(method string, url string, user string, password stri
 
 func sendDataToZincSearchIndexer(data []EmailModel.Email) {
 	method := http.MethodPost
-	url := "http://localhost:4080/api/enronCorpEmails/_doc"
-	user := "admin"               //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
-	password := "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
+	url := fmt.Sprintf("%s/api/%s/_doc", host, index)
 
 	for i := 0; i < len(data); i++ {
 
@@ -308,9 +299,7 @@ func sendBulkData(data []EmailModel.Email) {
 	}
 
 	method := http.MethodPost
-	url := "http://localhost:4080/api/_bulkv2"
-	user := "admin"
-	password := "Complexpass#123"
+	url := fmt.Sprintf("%s/api/_bulkv2", host)
 
 	payloadBuf := new(bytes.Buffer)
 

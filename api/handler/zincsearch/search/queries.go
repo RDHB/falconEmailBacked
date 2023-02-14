@@ -7,7 +7,7 @@ import (
 
 // GetQueryGetAll obtain a valid string in orden to consume api: search/{index}/get_all
 func GetQueryGetAll(reqBody zincsearchModels.GetAllRequest) string {
-	return fmt.Sprintf(`{"search_type": "alldocuments","from": %d,"max_results": %d}`, (reqBody.Page-1)*reqBody.MaxDataPage, reqBody.MaxDataPage)
+	return fmt.Sprintf(`{"search_type": "alldocuments", "from": %d, "max_results": %d, "sort_fields": ["-date"]}`, (reqBody.Page-1)*reqBody.MaxDataPage, reqBody.MaxDataPage)
 }
 
 // GetQuerySearchEmails obtain a valid string in orden to consume api: search/{index}/search_emails
@@ -22,7 +22,8 @@ func GetQuerySearchEmails(reqBody zincsearchModels.GetSearchEmails) string {
 		"max_results": %d, 
 		"highlight": {
 			"pre_tags": ["<%s>"],
-			"post_tags": ["</%s>"],    
+			"post_tags": ["</%s>"],
+			"sort_fields": ["-date"],    
 			"fields": {
 				"bcc": {
 					"pre_tags": [],
