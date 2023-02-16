@@ -42,6 +42,7 @@ func indexerEmails(filePath string) {
 	if error != nil {
 		log.Println(error)
 	}
+
 	log.Println("Data was obtained from tgz file")
 
 	sendDataToZincSearchIndexer(data)
@@ -85,6 +86,7 @@ func getDataFromFileTGZ(filePath string) ([]EmailModel.Email, error) {
 		case tar.TypeDir:
 			continue
 		case tar.TypeReg:
+			// emails = append(emails, getEmail(tarReader, header))
 			if strings.Contains(header.Name, "all_documents") {
 				emails = append(emails, getEmail(tarReader, header))
 			}
@@ -158,13 +160,13 @@ func getEmail(tarReader *tar.Reader, header *tar.Header) EmailModel.Email {
 	dateS, _ := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700 (PST)", date)
 
 	return EmailModel.Email{
-		BCC:     strings.Join(bcc, ";"),
-		CC:      strings.Join(cc, ";"),
+		BCC:     strings.Join(bcc, "; "),
+		CC:      strings.Join(cc, "; "),
 		Date:    dateS.Format(time.RFC3339),
 		From:    from,
 		Message: strings.Join(messages, " "),
 		Subject: subject,
-		To:      strings.Join(to, ";"),
+		To:      strings.Join(to, "; "),
 	}
 }
 

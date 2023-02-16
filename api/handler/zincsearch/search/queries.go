@@ -20,8 +20,9 @@ func GetQuerySearchEmails(reqBody zincsearchModels.GetSearchEmails) string {
 		},
 		"from": %d,
 		"max_results": %d, 
+		"sort_fields": ["-date"],
 		"highlight": {
-			"pre_tags": ["<%s>"],
+			"pre_tags": ["<%s class='%s'>"],
 			"post_tags": ["</%s>"],
 			"sort_fields": ["-date"],    
 			"fields": {
@@ -56,5 +57,5 @@ func GetQuerySearchEmails(reqBody zincsearchModels.GetSearchEmails) string {
 			}
 		} 
 	}
-	`, reqBody.SearchType, reqBody.Term, (reqBody.Page-1)*reqBody.MaxDataPage, reqBody.MaxDataPage, reqBody.TagHighlightName, reqBody.TagHighlightName)
+	`, reqBody.SearchType, reqBody.Term, (reqBody.Page-1)*reqBody.MaxDataPage, reqBody.MaxDataPage, reqBody.TagHighlightName, reqBody.ClassTagHighlight, reqBody.TagHighlightName)
 }

@@ -7,16 +7,16 @@ package models
 type GetAllRequest struct {
 	Page        int64 `json:"page"`
 	MaxDataPage int64 `json:"max_data_page"`
-	// TotalPagers int64 `json:"total_pages"`
 }
 
 // GetSearchEmails model that define parameter that client should pass in orden to consume api: search/{index}/search_emails
 type GetSearchEmails struct {
-	Page             int64  `json:"page"`
-	MaxDataPage      int64  `json:"max_data_page"`
-	SearchType       string `json:"search_type"`
-	Term             string `json:"term"`
-	TagHighlightName string `json:"tag_highlight_name"`
+	Page              int64  `json:"page"`
+	MaxDataPage       int64  `json:"max_data_page"`
+	SearchType        string `json:"search_type"`
+	Term              string `json:"term"`
+	TagHighlightName  string `json:"tag_highlight_name,omitempty"`
+	ClassTagHighlight string `json:"class_tag_highlight,omitempty"`
 }
 
 // ======================================================================================================

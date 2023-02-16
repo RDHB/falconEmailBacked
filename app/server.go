@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -21,18 +20,18 @@ func init() {
 }
 
 func main() {
-	port := fmt.Sprintf("%s", os.Getenv("FALCON_EMAIL_PORT_SERVER"))
+	port := os.Getenv("FALCON_EMAIL_PORT_SERVER")
 	log.Printf("Serving on port%s", port)
 	http.ListenAndServe(port, falconEmailServer.InitializeZincSearchRouter()) //revisar y cambiar por lo comentado en la versión final
-	//	server := &http.Server{
-	//		Addr:              port,
-	//		Handler:           falconEmailServer.InitializeZincSearchRouter(),
-	//		ReadHeaderTimeout: 3 * time.Second,
-	//	}
-	//
+	// server := &http.Server{
+	// 	Addr:              port,
+	// 	Handler:           falconEmailServer.InitializeZincSearchRouter(),
+	// 	ReadHeaderTimeout: 3 * time.Second,
+	// }
+
 	// err := server.ListenAndServe()
-	//
-	//	if err != nil {
-	//		log.Fatalf(fmt.Sprintf("Error initializing the server %s", err))
-	//	}
+
+	// if err != nil {
+	// 	log.Fatalf(fmt.Sprintf("Error initializing the server %s", err))
+	// }
 }

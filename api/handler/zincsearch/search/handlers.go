@@ -164,6 +164,10 @@ func GetSearchEmails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if reqBody.TagHighlightName != "" {
+		GetHighlightedReponse(&zincSearchResponseJSON, reqBody)
+	}
+
 	// wrinting a response for request
 	totalData := int64(zincSearchResponseJSON.Hits.Total.Value)
 	data := zincSearchResponseJSON.Hits.Hits
