@@ -18,15 +18,14 @@ import (
 )
 
 const (
-	index    = "enronCorpEmailsN"
-	host     = "http://localhost:4080"
-	user     = "admin"           //os.Getenv("ZINCSEARCH_USER_ID_ADMIN")
-	password = "Complexpass#123" //os.Getenv("ZINCSEARCH_PASSWORD_ADMIN")
+	index = "enronCorpEmails"
 )
 
 // Indexer function that allow send indexed data to zincsearch
 func Indexer() {
+
 	filepath := "/home/rdhb/go/src/falconEmailBackend/data/enron_mail_20110402.tgz"
+
 	indexerEmails(filepath)
 }
 
@@ -172,101 +171,20 @@ func getEmail(tarReader *tar.Reader, header *tar.Header) EmailModel.Email {
 
 func createIndexZincSearchEnronCorpEmails() {
 	method := http.MethodPost
-	url := fmt.Sprintf("%s/api/index", host)
-	body := `{
-		"name": "enronCorpEmailsN",
-		"storage_type": "disk",
-		"shard_num": 3,
-		"mappings": {
-			"properties": {
-				"@timestamp": {
-					"type": "date",
-					"index": true,
-					"store": true,
-					"sortable": true,
-					"aggregatable": true,
-					"highlightable": true
-				},
-				"_id": {
-					"type": "keyword",
-					"index": true,
-					"store": false,
-					"sortable": true,
-					"aggregatable": true,
-					"highlightable": false
-				},
-				"bcc": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				},
-				"cc": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				},
-				"date": {
-					"type": "date",
-					"format": "2006-01-02T15:04:05Z07:00",
-					"index": true,
-					"store": true,
-					"sortable": true,
-					"aggregatable": true,
-					"highlightable": true
-				},
-				"from": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				},
-				"message": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				},
-				"subject": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				},
-				"to": {
-					"type": "text",
-					"index": true,
-					"store": true,
-					"sortable": false,
-					"aggregatable": false,
-					"highlightable": true
-				}
-			}
-		}
-	}`
+	url := fmt.Sprintf("%s/api/index", os.Getenv("ZINCSEARCH_ZINCHOST"))
+	body := GetCreateIndexQueryHighlightEnabled(index)
 
-	zincsearchSendDataAPI(method, url, user, password, bytes.NewBuffer([]byte(body)))
+	zincsearchSendDataAPI(method, url, bytes.NewBuffer([]byte(body)))
 }
 
-func zincsearchSendDataAPI(method string, url string, user string, password string, body *bytes.Buffer) {
+func zincsearchSendDataAPI(method string, url string, body *bytes.Buffer) {
 
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		log.Println(err)
 	}
 
-	req.SetBasicAuth(user, password)
+	req.SetBasicAuth(os.Getenv("ZINCSEARCH_USER_ID_ADMIN"), os.Getenv("ZINCSEARCH_PASSWORD_ADMIN"))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -274,12 +192,15 @@ func zincsearchSendDataAPI(method string, url string, user string, password stri
 		log.Println(err)
 	}
 
-	resp.Body.Close()
+	error := resp.Body.Close()
+	if error != nil {
+		log.Println(error)
+	}
 }
 
 func sendDataToZincSearchIndexer(data []EmailModel.Email) {
 	method := http.MethodPost
-	url := fmt.Sprintf("%s/api/%s/_doc", host, index)
+	url := fmt.Sprintf("%s/api/%s/_doc", os.Getenv("ZINCSEARCH_ZINCHOST"), index)
 
 	for i := 0; i < len(data); i++ {
 
@@ -290,18 +211,18 @@ func sendDataToZincSearchIndexer(data []EmailModel.Email) {
 			log.Println(error)
 		}
 
-		zincsearchSendDataAPI(method, url, user, password, payloadBuf)
+		zincsearchSendDataAPI(method, url, payloadBuf)
 	}
 }
 
 func sendBulkData(data []EmailModel.Email) {
 	bulkData := EmailModel.ZinckSearchBulkData{
-		Index:   "enronCorpEmails",
+		Index:   index,
 		Records: data,
 	}
 
 	method := http.MethodPost
-	url := fmt.Sprintf("%s/api/_bulkv2", host)
+	url := fmt.Sprintf("%s/api/_bulkv2", os.Getenv("ZINCSEARCH_ZINCHOST"))
 
 	payloadBuf := new(bytes.Buffer)
 
@@ -310,5 +231,5 @@ func sendBulkData(data []EmailModel.Email) {
 		log.Println(error)
 	}
 
-	zincsearchSendDataAPI(method, url, user, password, payloadBuf)
+	zincsearchSendDataAPI(method, url, payloadBuf)
 }

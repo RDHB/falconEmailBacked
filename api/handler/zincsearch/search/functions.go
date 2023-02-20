@@ -70,16 +70,5 @@ func getDataHighlighted(valueItemsHighlight []string, valueItemSource string, ta
 		itemHighlighted = strings.ReplaceAll(valueItemSource, replaceText, replacementText)
 	}
 
-	// log.Println("=====================")
-	// log.Println(valueItemSource)
-	// log.Println("---------------------")
-	// log.Println(valueItemsHighlight)
-	// log.Println("---------------------")
-	// log.Println(replacementText)
-	// log.Println("---------------------")
-	// log.Println(replaceText)
-	// log.Println("=====================")
-	// log.Println(itemHighlighted)
-
 	return itemHighlighted
 }

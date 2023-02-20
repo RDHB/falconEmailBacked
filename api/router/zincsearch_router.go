@@ -28,7 +28,7 @@ func InitializeZincSearchRouter() *chi.Mux {
 	app.Use(middleware.StripSlashes)
 	app.Use(middleware.AllowContentType("application/json", "text/xml"))
 	app.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:8080"},
 		AllowedMethods:   []string{"GET", "PUT", "POST", "DELETE", "HEAD", "OPTION"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
